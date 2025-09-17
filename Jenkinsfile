@@ -1,10 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'node:18-alpine'
-      args '-u root:root'
-    }
-  }
+  agent any
 
   environment {
     NODE_ENV = 'test'
@@ -19,12 +14,28 @@ pipeline {
       }
     }
 
+    stage('Verify Node.js') {
+      steps {
+        script {
+          if (isUnix()) {
+            sh 'node -v && npm -v'
+          } else {
+            bat 'node -v & npm -v'
+          }
+        }
+      }
+    }
+
     stage('Install') {
       steps {
         dir('todo-backend') {
-          sh 'node -v'
-          sh 'npm -v'
-          sh 'npm ci || npm install'
+          script {
+            if (isUnix()) {
+              sh 'npm ci || npm install'
+            } else {
+              bat 'cmd /c npm ci || npm install'
+            }
+          }
         }
       }
     }
@@ -32,7 +43,13 @@ pipeline {
     stage('Test') {
       steps {
         dir('todo-backend') {
-          sh 'npm test'
+          script {
+            if (isUnix()) {
+              sh 'npm test'
+            } else {
+              bat 'npm test'
+            }
+          }
         }
       }
     }
