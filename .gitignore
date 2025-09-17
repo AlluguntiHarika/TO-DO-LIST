@@ -1,0 +1,22 @@
+# Node.js dependencies
+todo-backend/node_modules/
+
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# Build outputs
+dist/
+build/
+
+# Testing
+coverage/
+__tests__/
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace

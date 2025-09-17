@@ -12,8 +12,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// ✅ Connect to MongoDB
-mongoose.connect("mongodb://127.0.0.1:27017/todo_app", {
+// ✅ Connect to MongoDB (configurable via env)
+const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/todo_app";
+mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -114,6 +115,10 @@ app.get("/api/me", async (req, res) => {
   }
 });
 
-// ✅ Start server
+// ✅ Start server only when not under test
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+}
+
+module.exports = app;
