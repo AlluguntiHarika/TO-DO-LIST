@@ -1,90 +1,75 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    NODE_ENV = 'test'
-    JWT_SECRET = 'jenkins-test-secret'
-    CI = 'true'
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
+    environment {
+        PROJECT_ID = 'global-tine-472414-v8'  // GCP project
+        REPO = 'us-central1-docker.pkg.dev/global-tine-472414-v8/todo-list'
+        IMAGE = "${REPO}:latest"
+        GCLOUD_KEY_FILE = credentials('gcp-service-account') // Jenkins secret
+        NODE_ENV = 'test'
+        JWT_SECRET = 'jenkins-test-secret'
+        CI = 'true'
     }
 
-    stage('Verify Node.js') {
-      steps {
-        script {
-          if (isUnix()) {
-            sh '''
-              set -e
-              if ! command -v node >/dev/null 2>&1; then
-                export NVM_DIR="$HOME/.nvm"
-                if [ ! -s "$NVM_DIR/nvm.sh" ]; then
-                  curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-                fi
-                . "$NVM_DIR/nvm.sh"
-                nvm install 18
-                nvm use 18
-              fi
-              node -v
-              npm -v
-            '''
-          } else {
-            bat 'node -v & npm -v'
-          }
-        }
-      }
-    }
-
-    stage('Install') {
-      steps {
-        dir('todo-backend') {
-          script {
-            if (isUnix()) {
-              sh '''
-                set -e
-                export NVM_DIR="$HOME/.nvm"
-                . "$NVM_DIR/nvm.sh" || true
-                nvm use 18 || nvm install 18
-                npm ci || npm install
-              '''
-            } else {
-              bat 'cmd /c npm ci || npm install'
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/AlluguntiHarika/TO-DO-LIST.git'
             }
-          }
         }
-      }
-    }
 
-    stage('Test') {
-      steps {
-        dir('todo-backend') {
-          script {
-            if (isUnix()) {
-              sh '''
-                set -e
-                export NVM_DIR="$HOME/.nvm"
-                . "$NVM_DIR/nvm.sh" || true
-                nvm use 18 || nvm install 18
-                npm test
-              '''
-            } else {
-              bat 'npm test'
+        stage('Install & Test Node.js') {
+            steps {
+                dir('todo-backend') {
+                    script {
+                        if (isUnix()) {
+                            sh '''
+                              set -e
+                              export NVM_DIR="$HOME/.nvm"
+                              . "$NVM_DIR/nvm.sh" || true
+                              nvm install 18
+                              nvm use 18
+                              npm ci || npm install
+                              npm test
+                            '''
+                        } else {
+                            bat '''
+                              npm ci || npm install
+                              npm test
+                            '''
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-    }
-  }
 
-  post {
-    always {
-      echo 'Pipeline finished.'
+        stage('Authenticate GCP') {
+            steps {
+                sh '''
+                  echo $GCLOUD_KEY_FILE > key.json
+                  gcloud auth activate-service-account --key-file=key.json
+                  gcloud auth configure-docker us-central1-docker.pkg.dev
+                '''
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t ${IMAGE} ."
+            }
+        }
+
+        stage('Push to Artifact Registry') {
+            steps {
+                sh "docker push ${IMAGE}"
+            }
+        }
     }
-  }
+
+    post {
+        always {
+            sh 'rm -f key.json'
+            echo 'Pipeline finished.'
+        }
+    }
 }
-
-
