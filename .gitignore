@@ -13,7 +13,9 @@ build/
 
 # Testing
 coverage/
-__tests__/
+# Ignore only root-level __tests__ but keep backend tests
+/__tests__/
+!todo-backend/__tests__/
 
 # IDE files
 .vscode/
