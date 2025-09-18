@@ -68,8 +68,10 @@ pipeline {
 
     post {
         always {
-            sh 'rm -f key.json'
-            echo 'Pipeline finished.'
+            node {
+                sh 'rm -f key.json'
+                echo 'Pipeline finished.'
+            }
         }
     }
 }
