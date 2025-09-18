@@ -1,0 +1,32 @@
+# .travis.yml for TO-DO-LIST (Node + Docker + Render deploy)
+
+language: minimal
+sudo: required
+
+services:
+  - docker
+
+env:
+  global:
+    - RENDER_SERVICE_ID=srv-d35oko6mcj7s73a3iphg   # Your Render Service ID
+    - PORT=3000                                     # Port used by your backend
+    - NODE_ENV=production
+
+before_install:
+  - echo "Starting Travis CI build for TO-DO-LIST"
+
+script:
+  - echo "Building Docker image..."
+  - docker build -t todo-list .
+
+after_success:
+  - echo "Deploying Docker image to Render..."
+  - >
+    curl -X POST "https://api.render.com/deploy/srv-d35oko6mcj7s73a3iphg/web"
+    -H "Authorization: Bearer $RENDER_API_KEY"
+    -H "Content-Type: application/json"
+    -d '{}'
+
+branches:
+  only:
+    - main
