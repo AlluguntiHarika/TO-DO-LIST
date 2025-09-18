@@ -1,4 +1,4 @@
-# .travis.yml for TO-DO-LIST (Node + Docker + Render deploy)
+# .travis.yml for TO-DO-LIST (Node + Docker + Render deploy using deploy hook)
 
 language: minimal
 sudo: required
@@ -8,9 +8,14 @@ services:
 
 env:
   global:
-    - RENDER_SERVICE_ID=srv-d35oko6mcj7s73a3iphg   # Your Render Service ID
-    - PORT=3000                                     # Port used by your backend
+    # Port your backend uses inside Docker
+    - PORT=3000
+    # Node environment
     - NODE_ENV=production
+    # MongoDB URI (set in Travis or Render as env variable for security)
+    - MONGO_URI=mongodb+srv://harikaallugunti_db_user:mBirLtZj3TkQQckB@cluster0.zuwcyeo.mongodb.net/todoapp?retryWrites=true&w=majority
+    # JWT secret (set in Travis or Render as env variable)
+    - JWT_SECRET=your-strong-secret
 
 before_install:
   - echo "Starting Travis CI build for TO-DO-LIST"
@@ -20,12 +25,9 @@ script:
   - docker build -t todo-list .
 
 after_success:
-  - echo "Deploying Docker image to Render..."
-  - >
-    curl -X POST "https://api.render.com/deploy/srv-d35oko6mcj7s73a3iphg/web"
-    -H "Authorization: Bearer $RENDER_API_KEY"
-    -H "Content-Type: application/json"
-    -d '{}'
+  - echo "Deploying Docker image to Render via deploy hook..."
+  # Replace this with your actual deploy hook URL
+  - curl -X POST "https://api.render.com/deploy/srv-d35oko6mcj7s73a3iphg?key=MVY4UIZ4i_s"
 
 branches:
   only:
