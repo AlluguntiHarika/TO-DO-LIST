@@ -9,13 +9,13 @@ COPY todo-backend/package*.json ./todo-backend/
 
 # Install backend dependencies
 WORKDIR /app/todo-backend
-RUN npm install
+RUN npm install --production
 
-# Copy the rest of the application code
+# Copy the rest of the application code, excluding files from .dockerignore
 WORKDIR /app
 COPY . .
 
-# Set environment variables
+# Set environment variables (you can keep NODE_ENV and PORT, do NOT hardcode MONGODB_URI)
 ENV NODE_ENV=production
 ENV PORT=3000
 
