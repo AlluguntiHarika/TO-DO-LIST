@@ -1,0 +1,50 @@
+# Node modules
+node_modules/
+npm-debug.log
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Git
+.git
+.gitignore
+
+# IDE specific files
+.vscode/
+.idea/
+
+# Build files
+build/
+dist/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Local development
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Azure
+.azure/
+.azure-pipelines/
+
+# Jenkins
+Jenkinsfile
+.jenkins/
+
+# Misc
+CHANGELOG.md
+dev-CHANGELOG.md
