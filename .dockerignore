@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Node modules
 node_modules/
 npm-debug.log
@@ -48,3 +49,12 @@ Jenkinsfile
 # Misc
 CHANGELOG.md
 dev-CHANGELOG.md
+=======
+node_modules
+npm-debug.log
+.env
+.git
+.vscode
+coverage
+.DS_Store
+>>>>>>> ca8c717 (Trigger Travis CI build)
