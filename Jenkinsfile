@@ -68,7 +68,7 @@ pipeline {
 
     post {
         always {
-            node('any') {
+            script {
                 sh 'rm -f key.json'
                 echo 'Pipeline finished.'
             }
