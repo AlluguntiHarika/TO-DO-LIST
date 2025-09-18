@@ -14,13 +14,13 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname, "..")));
 
-// ✅ Connect to MongoDB (configurable via env)
-const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/todo_app";
+// ✅ Connect to MongoDB (supports both local and Atlas)
+const MONGO_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/todoapp";
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.log("✅ MongoDB connected"))
+.then(() => console.log(`✅ MongoDB connected to ${MONGO_URI.includes("127.0.0.1") ? "local DB" : "Atlas"}`))
 .catch(err => console.error("❌ MongoDB connection error:", err));
 
 // ✅ Signup route
@@ -53,11 +53,11 @@ app.post("/api/signup", async (req, res) => {
   }
 });
 
-// ✅ Login route (with debug logs)
+// ✅ Login route
 app.post("/api/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log("📥 Login attempt:", username, password);
+    console.log("📥 Login attempt:", username);
 
     // find by username OR email
     const user = await User.findOne({
